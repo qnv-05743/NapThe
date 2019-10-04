@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CardActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:title="@string/napthecao"
+        app:titleTextColor="@android:color/white"></androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout
+        android:id="@+id/layout_3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_margin="4dp"
+        android:weightSum="7">
+
+        <TextView
+            android:id="@+id/mathe"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_gravity="center|left"
+            android:layout_margin="3dp"
+            android:layout_weight="4.5"
+            android:background="#03A9F4"
+            android:padding="2.5dp"
+            android:text="MÃ THẺ:"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/loai_mang"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_gravity="center|left"
+            android:layout_margin="3dp"
+            android:layout_weight="2.5"
+            android:background="#03A9F4"
+            android:padding="2.5dp"
+            android:text="MẠNG:"
+            android:textColor="#fff"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:layout_margin="5dp"
+        android:background="#03A9F4"
+        android:layout_below="@id/layout_3"></FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/content_frame"
+        android:background="#03A9F4"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/layout_4"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:weightSum="6">
+
+            <TextView
+                android:id="@+id/ma_so"
+                android:text="123"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_gravity="center|left"
+                android:layout_margin="3dp"
+                android:layout_weight="5"
+                android:background="#fff"
+                android:gravity="center_vertical"
+                android:padding="2.5dp"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="32dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center|left"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="#F44336"
+                android:onClick="Submit"
+                android:padding="2.5dp"
+                android:text="NẠP THẺ"
+                android:textColor="#fff"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_btn"
+            android:layout_width="fill_parent"
+            android:layout_height="30dp"
+            android:layout_below="@id/layout_4"
+            android:weightSum="9">
+
+            <Button
+                android:onClick="Copy"
+                android:id="@+id/btn_copy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:background="#0068B9"
+                android:text="SAO CHÉP"
+                android:textColor="#fff"
+                android:textStyle="bold" />
+
+            <Button
+                android:onClick="Guide"
+                android:id="@+id/btn_guide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:background="#0068B9"
+                android:text="HƯỚNG DẪN"
+                android:textColor="#fff"
+                android:textStyle="bold" />
+
+            <Button
+                android:onClick="Share"
+                android:id="@+id/btn_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:background="#0068B9"
+                android:text="CHIA SẺ"
+                android:textColor="#fff"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/layout_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/layout_btn"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:layout_width="319dp"
+                android:layout_height="wrap_content"
+                android:lines="5"
+                android:padding="10dp"
+                android:text="@string/hd2"
+                android:textColor="#fff"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/image_rescan"
+                android:layout_width="29dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:onClick="refresh"
+                android:src="@drawable/barcode" />
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>
