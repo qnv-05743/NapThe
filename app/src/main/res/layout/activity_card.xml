@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CardActivity">
+    tools:context=".ui.CardActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -13,51 +13,18 @@
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         app:title="@string/napthecao"
-        app:titleTextColor="@android:color/white"></androidx.appcompat.widget.Toolbar>
+        app:titleTextColor="@android:color/white">
+    </androidx.appcompat.widget.Toolbar>
 
-    <LinearLayout
-        android:id="@+id/layout_3"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
-        android:layout_margin="4dp"
-        android:weightSum="7">
-
-        <TextView
-            android:id="@+id/mathe"
-            android:layout_width="wrap_content"
-            android:layout_height="25dp"
-            android:layout_gravity="center|left"
-            android:layout_margin="3dp"
-            android:layout_weight="4.5"
-            android:background="#03A9F4"
-            android:padding="2.5dp"
-            android:text="MÃ THẺ:"
-            android:textColor="#fff"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/loai_mang"
-            android:layout_width="wrap_content"
-            android:layout_height="25dp"
-            android:layout_gravity="center|left"
-            android:layout_margin="3dp"
-            android:layout_weight="2.5"
-            android:background="#03A9F4"
-            android:padding="2.5dp"
-            android:text="MẠNG:"
-            android:textColor="#fff"
-            android:textStyle="bold" />
-
-    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="230dp"
-        android:layout_margin="5dp"
-        android:background="#03A9F4"
-        android:layout_below="@id/layout_3"></FrameLayout>
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="5dp"
+        android:background="#03A9F4"></FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -68,22 +35,22 @@
 
         <LinearLayout
             android:id="@+id/layout_4"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:weightSum="6">
 
-            <TextView
+            <EditText
                 android:id="@+id/ma_so"
-                android:text="123"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:layout_gravity="center|left"
                 android:layout_margin="3dp"
-                android:layout_weight="5"
+                android:layout_weight="4"
                 android:background="#fff"
                 android:gravity="center_vertical"
                 android:padding="2.5dp"
+                android:textSize="15dp"
                 android:textColor="#000000"
                 android:textStyle="bold" />
 
@@ -92,9 +59,10 @@
                 android:layout_height="35dp"
                 android:layout_gravity="center|left"
                 android:layout_margin="3dp"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:background="#F44336"
-                android:onClick="Submit"
+                android:id="@+id/btn_napthe"
+                android:onClick="Call"
                 android:padding="2.5dp"
                 android:text="NẠP THẺ"
                 android:textColor="#fff"
@@ -110,34 +78,34 @@
             android:weightSum="9">
 
             <Button
-                android:onClick="Copy"
                 android:id="@+id/btn_copy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:background="#0068B9"
+                android:onClick="Copy"
                 android:text="SAO CHÉP"
                 android:textColor="#fff"
                 android:textStyle="bold" />
 
             <Button
-                android:onClick="Guide"
                 android:id="@+id/btn_guide"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:background="#0068B9"
+                android:onClick="Guide"
                 android:text="HƯỚNG DẪN"
                 android:textColor="#fff"
                 android:textStyle="bold" />
 
             <Button
-                android:onClick="Share"
                 android:id="@+id/btn_share"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:background="#0068B9"
+                android:onClick="Share"
                 android:text="CHIA SẺ"
                 android:textColor="#fff"
                 android:textStyle="bold" />

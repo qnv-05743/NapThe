@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -19,22 +19,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
+
         android:orientation="vertical">
 
 
         <SurfaceView
+            android:visibility="visible"
             android:id="@+id/surfaceView"
             android:layout_width="match_parent"
-            android:layout_height="200dp" />
+            android:layout_height="250dp" />
 
-        <TextView
-            android:id="@+id/text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Message"
-            android:textSize="15dp"
-            android:textColor="#000000"
-            android:textStyle="bold" />
         <!--        <FrameLayout-->
         <!--            android:id="@+id/content_frame"-->
         <!--            android:layout_width="match_parent"-->
@@ -53,7 +47,7 @@
                 android:id="@+id/layout_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp">
+                android:layout_marginTop="17dp">
 
                 <TextView
                     android:layout_width="319dp"
@@ -101,7 +95,7 @@
                         android:padding="10dp"
                         android:text="Đèn Flash"
                         android:textColor="#fff"
-                        android:textSize="20dp"
+                        android:textSize="15dp"
                         android:textStyle="bold" />
 
                 </RelativeLayout>
@@ -127,7 +121,7 @@
                         android:padding="10dp"
                         android:text="Chia Sẻ"
                         android:textColor="#fff"
-                        android:textSize="20dp"
+                        android:textSize="15dp"
                         android:textStyle="bold" />
 
                 </RelativeLayout>

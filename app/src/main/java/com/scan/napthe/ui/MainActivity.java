@@ -1,25 +1,25 @@
-package com.scan.napthe;
+package com.scan.napthe.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
@@ -42,24 +42,42 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.google.zxing.Result;
+import com.scan.napthe.R;
+import com.scan.napthe.ultils.Constants;
 
 import java.io.IOException;
-import java.security.Policy;
+import java.lang.reflect.Parameter;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+
 //implements ZXingScannerView.ResultHandler
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     CameraSource mCameraSource;
     final int requestPermissionID = 1001;
-    public SurfaceView mCameraView;
-    TextView mTextView;
+    private SurfaceView mCameraView;
     private SeekBar seekBar;
-    private static final String FLASH_STATE = "FLASH_STATE";
     AlertDialog alertDialog;
-    private ZXingScannerView mScannerView;
-    private boolean mFlash;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case requestPermissionID: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    try {
+                        mCameraSource.start(mCameraView.getHolder());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+            break;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +86,29 @@ public class MainActivity extends AppCompatActivity{
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         mCameraView = (SurfaceView) findViewById(R.id.surfaceView);
-        mTextView = findViewById(R.id.text_view);
+
         seekBar = findViewById(R.id.seekbar_controls);
         setSupportActionBar(toolbar);
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
-        mScannerView = new ZXingScannerView(this);
-      //  contentFrame.addView(mScannerView);
+        //  contentFrame.addView(mScannerView);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         startCameraSource();
     }
 
@@ -88,9 +123,9 @@ public class MainActivity extends AppCompatActivity{
             //Initialize camerasource to use high resolution and set Autofocus on.
             mCameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
-                    .setRequestedPreviewSize(640, 480)
+                    .setRequestedPreviewSize(1280, 1024)
+                    .setRequestedFps(2.0f)
                     .setAutoFocusEnabled(true)
-                    .setRequestedFps(30f)
                     .build();
 
             /**
@@ -125,7 +160,7 @@ public class MainActivity extends AppCompatActivity{
                  * Release resources for cameraSource
                  */
                 @Override
-                public void surfaceDestroyed(SurfaceHolder holder) {
+                public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
                     mCameraSource.stop();
                 }
             });
@@ -145,18 +180,30 @@ public class MainActivity extends AppCompatActivity{
                     final SparseArray<TextBlock> items = detections.getDetectedItems();
                     if (items.size() != 0) {
 
-                        mTextView.post(new Runnable() {
+                        mCameraView.post(new Runnable() {
                             @Override
                             public void run() {
+
                                 StringBuilder stringBuilder = new StringBuilder();
 
                                 for (int i = 0; i < items.size(); i++) {
                                     TextBlock item = items.valueAt(i);
                                     stringBuilder.append(item.getValue());
-                                    //stringBuilder.append("\n");
+                                    stringBuilder.append("\n");
                                 }
-                                mTextView.setText(stringBuilder.toString());
+                                String s = detectCode(stringBuilder.toString());
+                                if (s.isEmpty()) {
+                                    onPause();
+                                } else if (s.length() <= 14) {
+                                    Vibrator();
+                                    Intent intent = new Intent(MainActivity.this, CardActivity.class);
+                                    intent.putExtra(Constants.CODE_NUMBER, s);
+                                    Log.d("TAG", "run: " + s);
+                                    startActivity(intent);
+                                }
+
                             }
+
                         });
                     }
                 }
@@ -164,15 +211,39 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    public void Vibrator() {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+    }
+
+    String NUMBER = "0123456789";
+
+    public String detectCode(String input) {
+
+        Log.d("///////// ", "in " + input);
+        String code = "";
+        for (int i = 0; i < input.length(); i++) {
+            String currentString = String.valueOf(input.charAt(i));
+            Log.d("///////// ", "currentString " + currentString);
+            if (NUMBER.contains(currentString)) {
+                code += currentString;
+            } else if (currentString.equals(" ") || currentString.equals("-")) {
+                continue;
+            } else if (code.length() < 12) {
+                code = "";
+            } else {
+                break;
+            }
+        }
+        Log.d("///////// ", "out " + code);
+        return code;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        //mScannerView.setResultHandler(this);
-        // You can optionally set aspect ratio tolerance level
-        // that is used in calculating the optimal Camera preview size
-        //mScannerView.setAspectTolerance(0.2f);
-      //  mScannerView.startCamera();
-        mScannerView.setFlash(mFlash);
     }
 
     @Override
@@ -183,7 +254,6 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(FLASH_STATE, mFlash);
 
     }
 
@@ -201,14 +271,12 @@ public class MainActivity extends AppCompatActivity{
                 break;
             case R.id.menu2:
                 String url1 = "https://play.google.com/store?hl=en";
-
                 Intent ii = new Intent(Intent.ACTION_VIEW);
                 ii.setData(Uri.parse(url1));
                 startActivity(ii);
                 break;
             case R.id.menu3:
                 String url = "http://www.thongtincongty.com/company/3f88c631-cong-ty-co-phan-mgosu-viet-nam/";
-
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
@@ -232,11 +300,14 @@ public class MainActivity extends AppCompatActivity{
         final CheckBox checkbeep = (CheckBox) alertLayout.findViewById(R.id.cb_beep);
         final CheckBox checkrung = (CheckBox) alertLayout.findViewById(R.id.cb_rung);
         final Button button = (Button) alertLayout.findViewById(R.id.btn_close);
-
+        alert.setView(alertLayout);
+        alert.setCancelable(false);
+        final AlertDialog dialog = alert.create();
+        dialog.show();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertDialog.cancel();
+                dialog.cancel();
             }
         });
         checkbeep.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -249,55 +320,19 @@ public class MainActivity extends AppCompatActivity{
         checkrung.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
             }
         });
 
-
-
-        alert.setView(alertLayout);
-        alert.setCancelable(false);
-        AlertDialog dialog = alert.create();
-        dialog.show();
     }
 
 
-//    @Override
-//    public void handleResult(Result result) {
-//        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-//        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-//        r.play();
-//        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//        // Vibrate for 500 milliseconds
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
-//        } else {
-//            //deprecated in API 26
-//            v.vibrate(500);
-//        }
-//        Toast.makeText(this, result.getText() +
-//                ", Format : " + result.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
-//        Intent intent = new Intent(getApplicationContext(), CardActivity.class);
-//        startActivity(intent);
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mScannerView.resumeCameraPreview(MainActivity.this);
-//            }
-//        }, 6000);
-//    }
-
     public void toggleFlash(View v) {
-        mFlash = !mFlash;
-        mScannerView.setFlash(mFlash);
     }
 
     public void share(View view) {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        String shareBody = "Ứng dụng Quét mã thẻ nạp VIETTEL,MOBIFONE,VINAPHONE" + "" + "\n" +
-                "https://play.google.com/store";
+        String shareBody = "Ứng dụng Quét mã thẻ nạp VIETTEL,MOBIFONE,VINAPHONE" + "" + "\n" + Uri.parse("https://play.google.com/store");
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
         startActivity(Intent.createChooser(sharingIntent, "Quét mã thẻ điện thoại"));

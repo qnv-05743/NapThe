@@ -1,9 +1,11 @@
-package com.scan.napthe;
+package com.scan.napthe.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
+
+import com.scan.napthe.R;
 
 
 public class GuideActivity extends AppCompatActivity {

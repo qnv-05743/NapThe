@@ -1,16 +1,13 @@
-package com.scan.napthe;
+package com.scan.napthe.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.view.WindowManager;
+
+import com.scan.napthe.R;
 
 public class SplashActivity extends AppCompatActivity {
     private static final int ZXING_CAMERA_PERMISSION = 1;
