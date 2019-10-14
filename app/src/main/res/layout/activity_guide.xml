@@ -15,5 +15,23 @@
         app:title="@string/hd3"
         app:titleTextColor="@android:color/white"></androidx.appcompat.widget.Toolbar>
 
+    <TextView
+        android:id="@+id/txt_guid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_marginTop="10dp"
+        android:text="@string/guid"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txt_guid"
+        android:layout_marginTop="10dp"
+        android:text="@string/trogiup"
+        android:textColor="#000000"
+        android:textSize="20sp" />
 </RelativeLayout>

@@ -20,6 +20,7 @@ import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
@@ -46,6 +47,7 @@ import com.scan.napthe.R;
 import com.scan.napthe.ultils.Constants;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     private SurfaceView mCameraView;
     private SeekBar seekBar;
     AlertDialog alertDialog;
+    Camera camera;
+    boolean isFlash = false;
+    
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -95,7 +100,15 @@ public class MainActivity extends AppCompatActivity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Log.d("Error", "progress:"+progress);
 
+                // YOur code here in set zoom for pinch zooming, sth like this
+
+                if(camera.getParameters().isZoomSupported()){
+                   Camera.Parameters params = camera.getParameters();
+                    params.setZoom(progress);
+                    camera.setParameters(params);
+                }
             }
 
             @Override
@@ -123,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             //Initialize camerasource to use high resolution and set Autofocus on.
             mCameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
-                    .setRequestedPreviewSize(1280, 1024)
+                    .setRequestedPreviewSize(1080, 720)
                     .setRequestedFps(2.0f)
                     .setAutoFocusEnabled(true)
                     .build();
@@ -194,8 +207,9 @@ public class MainActivity extends AppCompatActivity {
                                 String s = detectCode(stringBuilder.toString());
                                 if (s.isEmpty()) {
                                     onPause();
-                                } else if (s.length() <= 14) {
-                                    Vibrator();
+                                } else if (s.length() <= 13){
+                                    vibrator();
+                                    notifycation();
                                     Intent intent = new Intent(MainActivity.this, CardActivity.class);
                                     intent.putExtra(Constants.CODE_NUMBER, s);
                                     Log.d("TAG", "run: " + s);
@@ -211,10 +225,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void Vibrator() {
+    private void notifycation() {
+        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
+    }
+
+    public void vibrator() {
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+
         }
     }
 
@@ -292,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayAlertDialog() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("TÙY CHỌN RUNG VÀ TIẾNG BEEP");
 
         LayoutInflater inflater = getLayoutInflater();
@@ -320,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
         checkrung.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
             }
         });
 
@@ -327,6 +348,34 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void toggleFlash(View v) {
+        Field[] declaredFields = CameraSource.class.getDeclaredFields();
+
+        for (Field field : declaredFields) {
+            if (field.getType() == Camera.class) {
+                field.setAccessible(true);
+                try {
+                    camera = (Camera) field.get(mCameraSource);
+                    if (camera != null) {
+                        Camera.Parameters params = camera.getParameters();
+                        if (!isFlash) {
+                            params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                            ///  flashImage.setColorFilter(getResources().getColor(R.color.yellow));
+                            isFlash = true;
+                        } else {
+                            params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                            // flashImage.setColorFilter(getResources().getColor(R.color.greyLight));
+                            isFlash = false;
+                        }
+                        camera.setParameters(params);
+                    }
+
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+            }
+        }
     }
 
     public void share(View view) {
