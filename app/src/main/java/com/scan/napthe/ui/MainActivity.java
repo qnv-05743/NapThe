@@ -40,6 +40,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
+import com.cymaybe.foucsurfaceview.FocusSurfaceView;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
@@ -52,18 +53,21 @@ import java.lang.reflect.Field;
 import java.security.Policy;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String SHARED_PREFERENCES_NAME = "PREFERENCES";
-    Toolbar toolbar;
-    CameraSource mCameraSource;
+    // private static final String SHARED_PREFERENCES_NAME = "PREFERENCES";
+    private Toolbar toolbar;
+    private CameraSource mCameraSource;
     final int requestPermissionID = 1001;
-    private SurfaceView mCameraView;
+    private FocusSurfaceView mCameraView;
     private SeekBar seekBar;
-    AlertDialog alertDialog;
-    Camera camera;
+    private AlertDialog alertDialog;
+    private Camera camera;
     boolean isFlash = false;
     private ImageView image_flash;
     public Camera.Parameters cameraParameter;
     private boolean isLighOn = false;
+    private Vibrator v;
+    private ToneGenerator toneGen;
+    boolean doubleBackToExitPressedOnce = false;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -91,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        mCameraView = (SurfaceView) findViewById(R.id.surfaceView);
+        mCameraView = (FocusSurfaceView) findViewById(R.id.surfaceView);
         setSupportActionBar(toolbar);
         seekBar = (SeekBar) findViewById(R.id.seekbar_controls);
         // Event on change zoom with the bar.
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         image_flash = (ImageView) findViewById(R.id.image_flash);
 
         startCameraSource();
+
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -123,20 +128,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
     }
 
-    private void releaseCamera() {
-        if (camera != null) {
-//            camera.setPreviewCallback(null);
-            camera.release();
-            camera = null;
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            finish();
+            return;
         }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Nhấn back 1 lần nữa để thoát!", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        releaseCamera();
+        camera.release();
 
     }
 
@@ -152,10 +171,9 @@ public class MainActivity extends AppCompatActivity {
             mCameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
                     .setRequestedPreviewSize(1204, 1080)
-                    .setRequestedFps(2.0f)
+                    .setRequestedFps(40.0f)
                     .setAutoFocusEnabled(true)
                     .build();
-
             /**
              * Add call back to SurfaceView and check if camera permission is granted.
              * If permission is granted we can start our cameraSource and pass it to surfaceView
@@ -191,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
 
-                    //camera.release();
+                    // camera.release();
                     mCameraSource.stop();
                 }
             });
@@ -236,7 +254,6 @@ public class MainActivity extends AppCompatActivity {
                         });
                     }
 
-
                 }
             });
         }
@@ -244,14 +261,13 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void notifycation() {
-        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_RING, 90);
-        toneGen1.startTone(ToneGenerator.TONE_PROP_BEEP, 40);
+        toneGen = new ToneGenerator(AudioManager.STREAM_RING, 90);
+        toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 100);
     }
 
 
     public void vibrator() {
-
-        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
 
@@ -290,6 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        // mCameraView.callOnClick();
         super.onPause();
     }
 
@@ -351,7 +368,6 @@ public class MainActivity extends AppCompatActivity {
         final AlertDialog dialog = alert.create();
         dialog.show();
         SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
-        //  SharedPreferences.Editor edit=pre.edit();
         boolean isVira = pre.getBoolean("rung", true);
         boolean isNoti = pre.getBoolean("beep", true);
         final int rungValue = pre.getInt("rung_value", 0);
@@ -379,8 +395,10 @@ public class MainActivity extends AppCompatActivity {
                     notifycation();
                 } else {
                     editor.putInt("beep_value", 1);
+                    //toneGen.stopTone();
                 }
                 editor.commit();
+
 
             }
         });
@@ -391,12 +409,12 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences sharedPreferences = getSharedPreferences("edit", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("rung", cb_rung.isChecked());
-
                 if (cb_rung.isChecked()) {
                     editor.putInt("rung_value", 0);
                     vibrator();
                 } else {
                     editor.putInt("rung_value", 1);
+                    //  v.cancel();
                 }
                 editor.commit();
             }
@@ -426,31 +444,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void toggleFlash(View v) {
-
-        if (isFlash == false) {
-            // if (!isFlash) {
-            onFlash();
-            //  isFlash = false;
-        } else if (isFlash == true){
-            offFlash();
-            //  isFlash = true;
-            //   }
+        Context context = getApplicationContext();
+        if (context.getPackageManager().hasSystemFeature(getPackageManager().FEATURE_CAMERA_FLASH)) {
+            Camera.Parameters params = camera.getParameters();
+            if (isFlash) {
+                params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                camera.setParameters(params);
+                isFlash = false;
+            } else {
+                params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                camera.setParameters(params);
+                isFlash = true;
+            }
         }
 
-    }
-
-    private void onFlash() {
-        cameraParameter.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(cameraParameter);
-        camera.startPreview();
-
-    }
-
-    private void offFlash() {
-        cameraParameter.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-        camera.setParameters(cameraParameter);
-        camera.stopPreview();
-      //  camera.release();
     }
 
     public void share(View view) {

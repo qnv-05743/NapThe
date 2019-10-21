@@ -9,8 +9,10 @@
     <string name="hd3">TRỢ GIÚP QUÉT MÃ THẺ CÀO ĐIỆN THOẠI TỰ ĐỘNG</string>
     <string name="cd">Tiếng Beep và rung là khi thấy quét được mã thẻ sẽ rung hoặc kêu beep</string>
     <string name="trogiup">
-                            - Đưa phần camera vào vùng mã thẻ đã được cạo sạch. "\n"
+                           "\n" - Đưa phần camera vào vùng mã thẻ đã được cạo sạch. "\n"
                             - Nhận mã thẻ chọn "Nạp thẻ" hoặc sao chép.
         </string>
-    <string name="guid">" "PHẦN MỀM NẠP THẺ ĐIỆN THOẠI :</string>
+    <string name="guid">"\n"PHẦN MỀM NẠP THẺ ĐIỆN THOẠI :</string>
+    <string name="napketqua">KẾT QUẢ MÃ THẺ CÀO ĐÃ ĐƯỢC QUÉT TỰ ĐỘNG</string>
+    <string name="second">ĐÃ QUÉT TỰ ĐỘNG</string>
 </resources>
