@@ -7,7 +7,13 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-feature android:name="android.hardware.camera.flash" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
 
     <application
@@ -19,7 +25,8 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ui.GuideActivity"></activity>
         <activity android:name=".ui.CardActivity" />
-        <activity android:name=".ui.MainActivity" />
+        <activity
+            android:name=".ui.MainActivity" />
         <activity android:name=".ui.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

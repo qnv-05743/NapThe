@@ -36,12 +36,15 @@ public class CardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_card);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
         textView = findViewById(R.id.ma_so);
         button = (Button) findViewById(R.id.btn_napthe);
-        String s = getIntent().getStringExtra(Constants.CODE_NUMBER);
+        String s = getIntent().getStringExtra(Constants.TEXT_CODE);
         textView.setText(Constants.DIAL_SERFIX + s + Constants.DIAL_HASHTAG);
 
     }
+
 
 
     public void Call(View view) {
@@ -72,8 +75,9 @@ public class CardActivity extends AppCompatActivity {
     }
 
     private void setClipboard() {
+        String s = getIntent().getStringExtra(Constants.TEXT_CODE);
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", textView.getText());
+        android.content.ClipData clip = android.content.ClipData.newPlainText("Copy Text", s);
         clipboard.setPrimaryClip(clip);
     }
 

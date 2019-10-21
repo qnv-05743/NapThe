@@ -19,20 +19,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-
         android:orientation="vertical">
 
+            <SurfaceView
+                android:id="@+id/surfaceView"
+                android:layout_width="fill_parent"
+                android:layout_height="208dp"
+                android:visibility="visible" />
 
-        <!--        <FrameLayout-->
-        <!--            android:id="@+id/content_frame"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="200dp" />-->
-
-        <SurfaceView
-            android:id="@+id/surfaceView"
-            android:layout_width="match_parent"
-            android:layout_height="200dip"
-            android:visibility="visible" />
 
         <RelativeLayout
             android:id="@+id/ln1"
@@ -63,7 +57,7 @@
                     android:layout_height="36dp"
                     android:layout_gravity="center"
                     android:onClick="Guide"
-                    android:src="@drawable/ic_error_outline_black_24dp" />
+                    android:src="@drawable/ic_error_outline_white_24dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -85,7 +79,7 @@
                         android:layout_width="88dp"
                         android:layout_height="47dp"
                         android:onClick="toggleFlash"
-                        android:src="@drawable/flash" />
+                        android:src="@drawable/flashlight" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -109,15 +103,15 @@
                     <ImageView
                         android:id="@+id/image_share"
                         android:layout_width="88dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="47dp"
                         android:onClick="share"
-                        android:src="@drawable/shaer" />
+                        android:src="@drawable/share" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/image_share"
-                        android:gravity="center"
+                        android:layout_marginLeft="10dp"
                         android:padding="10dp"
                         android:text="Chia Sẻ"
                         android:textColor="#fff"
@@ -136,39 +130,29 @@
                 android:weightSum="7">
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="28dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.5"
                     android:src="@drawable/ic_zoom_out_black_24dp" />
 
                 <SeekBar
-
                     android:id="@+id/seekbar_controls"
-                    android:layout_width="350dp"
+                    android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:layout_weight="5" />
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="4"
+                    android:outlineSpotShadowColor="#fff000" />
+
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="28dp"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/ic_zoom_in_black_24dp" />-->
-                <!--                <TextView-->
-                <!--                    android:id="@+id/text_view"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="50dp"-->
-                <!--                    android:layout_margin="8dp"-->
-                <!--                    android:layout_weight="1"-->
-                <!--                    android:gravity="center"-->
-                <!--                    android:text="@string/txt_message"-->
-                <!--                    android:textColor="@android:color/black"-->
-                <!--                    android:textSize="20sp"-->
-                <!--                    android:textStyle="bold" />-->
+                    android:layout_weight="1.5"
+                    android:src="@drawable/ic_zoom_in_black_24dp" />
             </LinearLayout>
 
 

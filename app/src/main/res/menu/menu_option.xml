@@ -15,6 +15,7 @@
         android:title="Giới thiệu MGOSU" />
     <item
         android:id="@+id/menu4"
-        android:icon="@android:drawable/ic_lock_silent_mode"
+        android:icon="@android:drawable/ic_delete"
         android:title="Phiên bản 1.0.0" />
+
 </menu>

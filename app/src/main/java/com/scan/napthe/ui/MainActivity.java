@@ -10,12 +10,10 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.Build;
@@ -23,10 +21,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -35,9 +35,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ZoomControls;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -48,12 +49,10 @@ import com.scan.napthe.ultils.Constants;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Parameter;
+import java.security.Policy;
 
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
-
-//implements ZXingScannerView.ResultHandler
 public class MainActivity extends AppCompatActivity {
+    private static final String SHARED_PREFERENCES_NAME = "PREFERENCES";
     Toolbar toolbar;
     CameraSource mCameraSource;
     final int requestPermissionID = 1001;
@@ -62,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog alertDialog;
     Camera camera;
     boolean isFlash = false;
-    
+    private ImageView image_flash;
+    public Camera.Parameters cameraParameter;
+    private boolean isLighOn = false;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -91,25 +92,25 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         mCameraView = (SurfaceView) findViewById(R.id.surfaceView);
-
-        seekBar = findViewById(R.id.seekbar_controls);
         setSupportActionBar(toolbar);
+        seekBar = (SeekBar) findViewById(R.id.seekbar_controls);
+        // Event on change zoom with the bar.
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
-        //  contentFrame.addView(mScannerView);
+        image_flash = (ImageView) findViewById(R.id.image_flash);
 
+        startCameraSource();
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("Error", "progress:"+progress);
-
-                // YOur code here in set zoom for pinch zooming, sth like this
-
-                if(camera.getParameters().isZoomSupported()){
-                   Camera.Parameters params = camera.getParameters();
+                Log.d("TAG", "onProgressChanged: " + progress);
+                if (camera != null && camera.getParameters().isZoomSupported()) {
+                    Camera.Parameters params = camera.getParameters();
                     params.setZoom(progress);
                     camera.setParameters(params);
                 }
+                initCamera();
             }
+
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -122,7 +123,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        startCameraSource();
+    }
+
+    private void releaseCamera() {
+        if (camera != null) {
+//            camera.setPreviewCallback(null);
+            camera.release();
+            camera = null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releaseCamera();
+
     }
 
     private void startCameraSource() {
@@ -136,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             //Initialize camerasource to use high resolution and set Autofocus on.
             mCameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
-                    .setRequestedPreviewSize(1080, 720)
+                    .setRequestedPreviewSize(1204, 1080)
                     .setRequestedFps(2.0f)
                     .setAutoFocusEnabled(true)
                     .build();
@@ -160,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
                         mCameraSource.start(mCameraView.getHolder());
+                        initCamera();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -174,6 +190,8 @@ public class MainActivity extends AppCompatActivity {
                  */
                 @Override
                 public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+                    //camera.release();
                     mCameraSource.stop();
                 }
             });
@@ -182,12 +200,10 @@ public class MainActivity extends AppCompatActivity {
             textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
                 @Override
                 public void release() {
+                    //camera.release();
                 }
 
-                /**
-                 * Detect all the text from camera using TextBlock and the values into a stringBuilder
-                 * which will then be set to the textView.
-                 * */
+
                 @Override
                 public void receiveDetections(Detector.Detections<TextBlock> detections) {
                     final SparseArray<TextBlock> items = detections.getDetectedItems();
@@ -206,37 +222,42 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 String s = detectCode(stringBuilder.toString());
                                 if (s.isEmpty()) {
-                                    onPause();
-                                } else if (s.length() <= 13){
-                                    vibrator();
-                                    notifycation();
+                                    s.split(NUMBER);
+                                } else if (s.equals(detectCode(s))) {
+                                    // getting boolean'
                                     Intent intent = new Intent(MainActivity.this, CardActivity.class);
-                                    intent.putExtra(Constants.CODE_NUMBER, s);
+                                    intent.putExtra(Constants.TEXT_CODE, s);
                                     Log.d("TAG", "run: " + s);
                                     startActivity(intent);
                                 }
-
                             }
+
 
                         });
                     }
+
+
                 }
             });
         }
     }
 
-    private void notifycation() {
-        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
-        toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
+
+    public void notifycation() {
+        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_RING, 90);
+        toneGen1.startTone(ToneGenerator.TONE_PROP_BEEP, 40);
     }
 
+
     public void vibrator() {
+
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE));
+            v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
 
         }
     }
+
 
     String NUMBER = "0123456789";
 
@@ -257,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
+        //
         Log.d("///////// ", "out " + code);
         return code;
     }
@@ -271,6 +293,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -279,7 +302,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_option, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_option, menu);
         return true;
     }
 
@@ -311,64 +335,87 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void displayAlertDialog() {
+
+    //        cb_beep.setChecked(isNoti);
+//        cb_rung.setChecked(isVira);
+    public void displayAlertDialog() {
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("TÙY CHỌN RUNG VÀ TIẾNG BEEP");
-
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.option_dialog, null);
-        final CheckBox checkbeep = (CheckBox) alertLayout.findViewById(R.id.cb_beep);
-        final CheckBox checkrung = (CheckBox) alertLayout.findViewById(R.id.cb_rung);
+        final CheckBox cb_beep = (CheckBox) alertLayout.findViewById(R.id.cb_beep);
+        final CheckBox cb_rung = (CheckBox) alertLayout.findViewById(R.id.cb_rung);
         final Button button = (Button) alertLayout.findViewById(R.id.btn_close);
         alert.setView(alertLayout);
         alert.setCancelable(false);
         final AlertDialog dialog = alert.create();
         dialog.show();
+        SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
+        //  SharedPreferences.Editor edit=pre.edit();
+        boolean isVira = pre.getBoolean("rung", true);
+        boolean isNoti = pre.getBoolean("beep", true);
+        final int rungValue = pre.getInt("rung_value", 0);
+        final int beepValue = pre.getInt("beep_value", 0);
+        cb_beep.setChecked(isNoti);
+        cb_rung.setChecked(isVira);
         button.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 dialog.cancel();
             }
         });
-        checkbeep.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+
+        cb_beep.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                SharedPreferences sharedPreferences = getSharedPreferences("edit", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("beep", cb_beep.isChecked());
+                if (cb_beep.isChecked()) {
+                    editor.putInt("beep_value", 0);
+                    notifycation();
+                } else {
+                    editor.putInt("beep_value", 1);
+                }
+                editor.commit();
 
             }
         });
 
-        checkrung.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        cb_rung.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences sharedPreferences = getSharedPreferences("edit", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("rung", cb_rung.isChecked());
 
+                if (cb_rung.isChecked()) {
+                    editor.putInt("rung_value", 0);
+                    vibrator();
+                } else {
+                    editor.putInt("rung_value", 1);
+                }
+                editor.commit();
             }
         });
 
     }
 
 
-    public void toggleFlash(View v) {
+    private void initCamera() {
         Field[] declaredFields = CameraSource.class.getDeclaredFields();
-
         for (Field field : declaredFields) {
             if (field.getType() == Camera.class) {
                 field.setAccessible(true);
                 try {
                     camera = (Camera) field.get(mCameraSource);
                     if (camera != null) {
-                        Camera.Parameters params = camera.getParameters();
-                        if (!isFlash) {
-                            params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                            ///  flashImage.setColorFilter(getResources().getColor(R.color.yellow));
-                            isFlash = true;
-                        } else {
-                            params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                            // flashImage.setColorFilter(getResources().getColor(R.color.greyLight));
-                            isFlash = false;
-                        }
-                        camera.setParameters(params);
+                        cameraParameter = camera.getParameters();
+                        //    camera.setParameters(cameraParameter);
                     }
-
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -376,6 +423,34 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    public void toggleFlash(View v) {
+
+        if (isFlash == false) {
+            // if (!isFlash) {
+            onFlash();
+            //  isFlash = false;
+        } else if (isFlash == true){
+            offFlash();
+            //  isFlash = true;
+            //   }
+        }
+
+    }
+
+    private void onFlash() {
+        cameraParameter.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(cameraParameter);
+        camera.startPreview();
+
+    }
+
+    private void offFlash() {
+        cameraParameter.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        camera.setParameters(cameraParameter);
+        camera.stopPreview();
+      //  camera.release();
     }
 
     public void share(View view) {
@@ -388,7 +463,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Guide(View view) {
-        Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
+        Intent intent = new Intent(MainActivity.this, GuideActivity.class);
         startActivity(intent);
     }
 }
