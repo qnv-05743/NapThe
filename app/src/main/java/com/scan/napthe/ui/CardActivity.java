@@ -38,16 +38,16 @@ public class CardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_card);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        textView = findViewById(R.id.ma_so);
-        button = (Button) findViewById(R.id.btn_napthe);
+        textView = findViewById(R.id.code);
+        button = (Button) findViewById(R.id.btn_submit);
         String s = getIntent().getStringExtra(Constants.TEXT_CODE);
         textView.setText(Constants.DIAL_SERFIX + s + Constants.DIAL_HASHTAG);
         final TextView first = (TextView) findViewById(R.id.txt_slide);
        // final TextView second = (TextView) findViewById(R.id.txt_second);
-        final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 1.0f);
+        final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 0.5f);
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setInterpolator(new LinearInterpolator());
-        animator.setDuration(9000L);
+        animator.setDuration(8000L);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -55,7 +55,7 @@ public class CardActivity extends AppCompatActivity {
                 final float width = first.getWidth();
                 final float translationX = width * progress;
                 first.setTranslationX(translationX);
-               // second.setTranslationX(translationX - width);
+              //  first.setTranslationX(translationX - width);
             }
         });
         animator.start();
@@ -115,7 +115,7 @@ public class CardActivity extends AppCompatActivity {
     public void Share(View view) {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        String shareBody = "Ứng dụng Quét mã thẻ nạp VIETTEL,MOBIFONE,VINAPHONE" + "" + "\n" +
+        String shareBody = R.string.share + "" + "\n" +
                 "https://play.google.com/store";
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);

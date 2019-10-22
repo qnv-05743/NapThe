@@ -1,18 +1,19 @@
 <resources>
     <string name="app_name">Nạp thẻ</string>
-    <string name="napthe">NẠP THẺ ĐIỆN THOẠI TỰ ĐỘNG</string>
-    <string name="quetma">QUÉT MÃ THẺ CÀO ĐIỆN THOẠI TỰ ĐỘNG</string>
-    <string name="hd">Di chuyển vùng camera tới thẻ cào điện thoại đã được cào sạch mã thẻ(không để camera quá gần).Hỗ trợ 3 nhà mạng Viettel,Mobifone và Vinaphone.</string>
+    <string name="title_name">NẠP THẺ ĐIỆN THOẠI TỰ ĐỘNG</string>
+    <string name="title_main">QUÉT MÃ THẺ CÀO ĐIỆN THOẠI TỰ ĐỘNG</string>
+    <string name="guide_main">Di chuyển vùng camera tới thẻ cào điện thoại đã được cào sạch mã thẻ(không để camera quá gần).Hỗ trợ 3 nhà mạng Viettel,Mobifone và Vinaphone.</string>
     <string name="txt_message">message</string>
-    <string name="napthecao">PHẦN MỀM NẠP THẺ ĐIỆN THOẠI</string>
-    <string name="hd2">Chọn thẻ nạp để tiến hành nạp.Chọn sao chép để chép mã gửi cho bạn bè,người thân.Chọn chia sẻ để chia sẻ ứng dụng cho mọi người cùng dùng.</string>
-    <string name="hd3">TRỢ GIÚP QUÉT MÃ THẺ CÀO ĐIỆN THOẠI TỰ ĐỘNG</string>
-    <string name="cd">Tiếng Beep và rung là khi thấy quét được mã thẻ sẽ rung hoặc kêu beep</string>
-    <string name="trogiup">
+    <string name="title_name_card">PHẦN MỀM NẠP THẺ ĐIỆN THOẠI</string>
+    <string name="guide_help">Chọn thẻ nạp để tiến hành nạp.Chọn sao chép để chép mã gửi cho bạn bè,người thân.Chọn chia sẻ để chia sẻ ứng dụng cho mọi người cùng dùng.</string>
+    <string name="title_name_guide">TRỢ GIÚP QUÉT MÃ THẺ CÀO ĐIỆN THOẠI TỰ ĐỘNG</string>
+    <string name="dialog">Tiếng Beep và rung là khi thấy quét được mã thẻ sẽ rung hoặc kêu beep</string>
+    <string name="help_guide">
                            "\n" - Đưa phần camera vào vùng mã thẻ đã được cạo sạch. "\n"
                             - Nhận mã thẻ chọn "Nạp thẻ" hoặc sao chép.
         </string>
     <string name="guid">"\n"PHẦN MỀM NẠP THẺ ĐIỆN THOẠI :</string>
-    <string name="napketqua">KẾT QUẢ MÃ THẺ CÀO ĐÃ ĐƯỢC QUÉT TỰ ĐỘNG</string>
+    <string name="title_result">KẾT QUẢ MÃ THẺ CÀO ĐÃ ĐƯỢC QUÉT TỰ ĐỘNG</string>
     <string name="second">ĐÃ QUÉT TỰ ĐỘNG</string>
+    <string name="share">Ứng dụng Quét mã thẻ nạp VIETTEL,MOBIFONE,VINAPHONE</string>
 </resources>

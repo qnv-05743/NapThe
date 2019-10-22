@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -101,9 +102,9 @@ public class MainActivity extends AppCompatActivity {
         // Event on change zoom with the bar.
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
         image_flash = (ImageView) findViewById(R.id.image_flash);
+        //  final FocusSurfaceView previewSFV = (FocusSurfaceView) findViewById(R.id.surfaceView);
 
         startCameraSource();
-
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -136,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed();
-            finish();
             return;
         }
 
@@ -148,8 +148,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 doubleBackToExitPressedOnce = false;
+                finish();
             }
+
         }, 2000);
+
     }
 
     @Override
@@ -214,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+
             //Set the TextRecognizer's Processor.
             textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
                 @Override
@@ -226,13 +230,11 @@ public class MainActivity extends AppCompatActivity {
                 public void receiveDetections(Detector.Detections<TextBlock> detections) {
                     final SparseArray<TextBlock> items = detections.getDetectedItems();
                     if (items.size() != 0) {
-
                         mCameraView.post(new Runnable() {
                             @Override
                             public void run() {
 
                                 StringBuilder stringBuilder = new StringBuilder();
-
                                 for (int i = 0; i < items.size(); i++) {
                                     TextBlock item = items.valueAt(i);
                                     stringBuilder.append(item.getValue());
@@ -243,13 +245,13 @@ public class MainActivity extends AppCompatActivity {
                                     s.split(NUMBER);
                                 } else if (s.equals(detectCode(s))) {
                                     // getting boolean'
+
                                     Intent intent = new Intent(MainActivity.this, CardActivity.class);
                                     intent.putExtra(Constants.TEXT_CODE, s);
                                     Log.d("TAG", "run: " + s);
                                     startActivity(intent);
                                 }
                             }
-
 
                         });
                     }
@@ -260,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void notifycation() {
+    public void notification() {
         toneGen = new ToneGenerator(AudioManager.STREAM_RING, 90);
         toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 100);
     }
@@ -279,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String detectCode(String input) {
 
-        Log.d("///////// ", "in " + input);
+        Log.d("///////// ", "in" + input);
         String code = "";
         for (int i = 0; i < input.length(); i++) {
             String currentString = String.valueOf(input.charAt(i));
@@ -288,6 +290,12 @@ public class MainActivity extends AppCompatActivity {
                 code += currentString;
             } else if (currentString.equals(" ") || currentString.equals("-")) {
                 continue;
+            } else if (currentString.length() == 13) {
+
+            } else if (currentString.length() == 12 && currentString.length() == 14) {
+
+            } else if (currentString.length() == 14) {
+
             } else if (code.length() < 12) {
                 code = "";
             } else {
@@ -386,13 +394,12 @@ public class MainActivity extends AppCompatActivity {
         cb_beep.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
                 SharedPreferences sharedPreferences = getSharedPreferences("edit", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("beep", cb_beep.isChecked());
                 if (cb_beep.isChecked()) {
                     editor.putInt("beep_value", 0);
-                    notifycation();
+                    notification();
                 } else {
                     editor.putInt("beep_value", 1);
                     //toneGen.stopTone();

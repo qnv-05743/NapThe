@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        app:title="@string/quetma"
+        app:title="@string/title_main"
         app:titleTextColor="@android:color/white"></androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
@@ -24,7 +24,7 @@
 
             <com.cymaybe.foucsurfaceview.FocusSurfaceView
                 android:background="@android:color/transparent"
-                app:focus_crop_height="100dp"
+                app:focus_crop_height="40dp"
                 app:focus_crop_width="270dp"
                 app:focus_frame_can_change="true"
                 app:focus_frame_color="@android:color/holo_green_dark"
@@ -37,7 +37,7 @@
                 app:focus_handle_size="14dp"
                 app:focus_min_frame_size="20dp"
                 app:focus_mode="custom"
-                app:focus_overlay_color="#66000000"
+                app:focus_overlay_color="#66131212"
                 app:focus_touch_padding="8dp"
                 android:id="@+id/surfaceView"
                 android:scaleType="fitXY"
@@ -66,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:lines="4"
                     android:padding="10dp"
-                    android:text="@string/hd"
+                    android:text="@string/guide_main"
                     android:textColor="#fff"
                     android:textStyle="bold" />
 
