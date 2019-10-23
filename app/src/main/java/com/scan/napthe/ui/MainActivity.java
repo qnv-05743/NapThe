@@ -389,8 +389,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
         boolean isVira = pre.getBoolean("rung", true);
         boolean isNoti = pre.getBoolean("beep", true);
-        final int rungValue = pre.getInt("rung_value", 0);
-        final int beepValue = pre.getInt("beep_value", 0);
+//        final int rungValue = pre.getInt("rung_value", 0);
+//        final int beepValue = pre.getInt("beep_value", 0);
         cb_beep.setChecked(isNoti);
         cb_rung.setChecked(isVira);
         button.setOnClickListener(new View.OnClickListener() {
