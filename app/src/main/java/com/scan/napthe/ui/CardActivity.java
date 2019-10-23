@@ -104,7 +104,7 @@ public class CardActivity extends AppCompatActivity {
 
     public void Copy(View view) {
         setClipboard();
-        Toast.makeText(this, "Đã sao chép !", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Đã copy mã thẻ!", Toast.LENGTH_SHORT).show();
     }
 
     public void Guide(View view) {

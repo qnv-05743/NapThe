@@ -268,8 +268,8 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
         boolean isNoti = pre.getBoolean("beep", true);
         if (isNoti) {
-            toneGen = new ToneGenerator(AudioManager.STREAM_RING, 90);
-            toneGen.startTone(ToneGenerator.TONE_CDMA_PIP, 100);
+            toneGen = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 90);
+            toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 100);
         }
 
     }
