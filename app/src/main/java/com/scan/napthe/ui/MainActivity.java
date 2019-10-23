@@ -244,13 +244,15 @@ public class MainActivity extends AppCompatActivity {
                                 if (s.isEmpty()) {
                                     s.split(NUMBER);
                                 } else if (s.equals(detectCode(s))) {
-                                    // getting boolean'
-
+                                    notification();
+                                    vibrator();
                                     Intent intent = new Intent(MainActivity.this, CardActivity.class);
                                     intent.putExtra(Constants.TEXT_CODE, s);
-                                    Log.d("TAG", "run: " + s);
                                     startActivity(intent);
+                                    Log.d("TAG", "run: " + s);
+                                    onPause();
                                 }
+
                             }
 
                         });
@@ -263,17 +265,28 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void notification() {
-        toneGen = new ToneGenerator(AudioManager.STREAM_RING, 90);
-        toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 100);
+        SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
+        boolean isNoti = pre.getBoolean("beep", true);
+        if (isNoti) {
+            toneGen = new ToneGenerator(AudioManager.STREAM_RING, 90);
+            toneGen.startTone(ToneGenerator.TONE_CDMA_PIP, 100);
+        }
+
     }
 
 
     public void vibrator() {
-        v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-
+        SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
+        boolean isVira = pre.getBoolean("rung", true);
+        if (isVira) {
+            v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
+                v.cancel();
+            }
         }
+
     }
 
 
@@ -314,8 +327,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        // mCameraView.callOnClick();
         super.onPause();
+        mCameraSource.stop();
     }
 
 
@@ -361,8 +374,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //        cb_beep.setChecked(isNoti);
-//        cb_rung.setChecked(isVira);
     public void displayAlertDialog() {
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("TÙY CHỌN RUNG VÀ TIẾNG BEEP");
@@ -399,7 +410,7 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean("beep", cb_beep.isChecked());
                 if (cb_beep.isChecked()) {
                     editor.putInt("beep_value", 0);
-                    notification();
+                    // notification();
                 } else {
                     editor.putInt("beep_value", 1);
                     //toneGen.stopTone();
@@ -418,10 +429,9 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean("rung", cb_rung.isChecked());
                 if (cb_rung.isChecked()) {
                     editor.putInt("rung_value", 0);
-                    vibrator();
+
                 } else {
                     editor.putInt("rung_value", 1);
-                    //  v.cancel();
                 }
                 editor.commit();
             }

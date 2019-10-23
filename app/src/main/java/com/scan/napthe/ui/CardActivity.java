@@ -40,7 +40,7 @@ public class CardActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         textView = findViewById(R.id.code);
         button = (Button) findViewById(R.id.btn_submit);
-        String s = getIntent().getStringExtra(Constants.TEXT_CODE);
+        String s = getIntent().getExtras().getString(Constants.TEXT_CODE);
         textView.setText(Constants.DIAL_SERFIX + s + Constants.DIAL_HASHTAG);
         final TextView first = (TextView) findViewById(R.id.txt_slide);
        // final TextView second = (TextView) findViewById(R.id.txt_second);
