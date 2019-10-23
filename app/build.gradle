@@ -33,7 +33,7 @@ dependencies {
     implementation 'com.github.CGmaybe10:FocusSurfaceView:v1.0.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 
-    implementation 'com.github.CGmaybe10:FocusSurfaceView:v1.0.1'
+
 
 
 }
