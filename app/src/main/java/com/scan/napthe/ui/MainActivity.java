@@ -13,6 +13,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -65,11 +67,9 @@ public class MainActivity extends AppCompatActivity {
     boolean isFlash = false;
     private ImageView image_flash;
     public Camera.Parameters cameraParameter;
-    private boolean isLighOn = false;
     private Vibrator v;
     private ToneGenerator toneGen;
     boolean doubleBackToExitPressedOnce = false;
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -99,12 +99,11 @@ public class MainActivity extends AppCompatActivity {
         mCameraView = (FocusSurfaceView) findViewById(R.id.surfaceView);
         setSupportActionBar(toolbar);
         seekBar = (SeekBar) findViewById(R.id.seekbar_controls);
-        // Event on change zoom with the bar.
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
         image_flash = (ImageView) findViewById(R.id.image_flash);
-        //  final FocusSurfaceView previewSFV = (FocusSurfaceView) findViewById(R.id.surfaceView);
-
         startCameraSource();
+
+        // Event on change zoom with the bar.
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -129,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
 
@@ -142,9 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
         this.doubleBackToExitPressedOnce = true;
         Toast.makeText(this, "Nhấn back 1 lần nữa để thoát!", Toast.LENGTH_SHORT).show();
-
         new Handler().postDelayed(new Runnable() {
-
             @Override
             public void run() {
                 doubleBackToExitPressedOnce = false;
@@ -158,12 +154,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        camera.release();
+//        camera.release();
 
     }
 
     private void startCameraSource() {
-        //Create the TextRecognizer
+        //Create the TextRecognizerd
         final TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
 
         if (!textRecognizer.isOperational()) {
@@ -173,10 +169,11 @@ public class MainActivity extends AppCompatActivity {
             //Initialize camerasource to use high resolution and set Autofocus on.
             mCameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
-                    .setRequestedPreviewSize(1204, 1080)
+                    .setRequestedPreviewSize(1204, 768)
                     .setRequestedFps(40.0f)
                     .setAutoFocusEnabled(true)
                     .build();
+
             /**
              * Add call back to SurfaceView and check if camera permission is granted.
              * If permission is granted we can start our cameraSource and pass it to surfaceView
@@ -222,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
             textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
                 @Override
                 public void release() {
-                    //camera.release();
+                    camera.release();
                 }
 
 
@@ -250,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                                     intent.putExtra(Constants.TEXT_CODE, s);
                                     startActivity(intent);
                                     Log.d("TAG", "run: " + s);
-                                    onPause();
+                                    mCameraSource.stop();
                                 }
 
                             }
@@ -271,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
             toneGen = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 90);
             toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 100);
         }
-
     }
 
 
@@ -303,13 +299,11 @@ public class MainActivity extends AppCompatActivity {
                 code += currentString;
             } else if (currentString.equals(" ") || currentString.equals("-")) {
                 continue;
-            } else if (currentString.length() == 13) {
+//            } else if (currentString.length() == 13 && currentString.length() == 12) {
+//
+//            } else if  (currentString.length() == 12 && currentString.length() == 14) {
 
-            } else if (currentString.length() == 12 && currentString.length() == 14) {
-
-            } else if (currentString.length() == 14) {
-
-            } else if (code.length() < 12) {
+            } else if (code.length() <= 12) {
                 code = "";
             } else {
                 break;
@@ -328,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mCameraSource.stop();
+
     }
 
 
@@ -389,8 +383,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
         boolean isVira = pre.getBoolean("rung", true);
         boolean isNoti = pre.getBoolean("beep", true);
-//        final int rungValue = pre.getInt("rung_value", 0);
-//        final int beepValue = pre.getInt("beep_value", 0);
+
         cb_beep.setChecked(isNoti);
         cb_rung.setChecked(isVira);
         button.setOnClickListener(new View.OnClickListener() {
@@ -410,10 +403,8 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean("beep", cb_beep.isChecked());
                 if (cb_beep.isChecked()) {
                     editor.putInt("beep_value", 0);
-                    // notification();
                 } else {
                     editor.putInt("beep_value", 1);
-                    //toneGen.stopTone();
                 }
                 editor.commit();
 
@@ -429,7 +420,6 @@ public class MainActivity extends AppCompatActivity {
                 editor.putBoolean("rung", cb_rung.isChecked());
                 if (cb_rung.isChecked()) {
                     editor.putInt("rung_value", 0);
-
                 } else {
                     editor.putInt("rung_value", 1);
                 }
@@ -480,10 +470,11 @@ public class MainActivity extends AppCompatActivity {
     public void share(View view) {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        String shareBody = "Ứng dụng Quét mã thẻ nạp VIETTEL,MOBIFONE,VINAPHONE" + "" + "\n" + Uri.parse("https://play.google.com/store");
+        String shareBody = R.string.share + "" + "\n" + Uri.parse("https://play.google.com/store");
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
         startActivity(Intent.createChooser(sharingIntent, "Quét mã thẻ điện thoại"));
+
     }
 
     public void Guide(View view) {

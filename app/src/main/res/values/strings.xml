@@ -7,7 +7,7 @@
     <string name="title_name_card">PHẦN MỀM NẠP THẺ ĐIỆN THOẠI</string>
     <string name="guide_help">Chọn thẻ nạp để tiến hành nạp.Chọn sao chép để chép mã gửi cho bạn bè,người thân.Chọn chia sẻ để chia sẻ ứng dụng cho mọi người cùng dùng.</string>
     <string name="title_name_guide">TRỢ GIÚP QUÉT MÃ THẺ CÀO ĐIỆN THOẠI TỰ ĐỘNG</string>
-    <string name="dialog">Tiếng Beep và rung là khi thấy quét được mã thẻ sẽ rung hoặc kêu beep</string>
+    <string name="dialog">Tiếng Beep và rung là khi quét được mã thẻ sẽ rung hoặc kêu beep (Có thể tùy chọn tắt bật cả hai hoặc một trong hai).</string>
     <string name="help_guide">
                            "\n" - Đưa phần camera vào vùng mã thẻ đã được cạo sạch. "\n"
                             - Nhận mã thẻ chọn "Nạp thẻ" hoặc sao chép.
@@ -16,4 +16,7 @@
     <string name="title_result">KẾT QUẢ MÃ THẺ CÀO ĐÃ ĐƯỢC QUÉT TỰ ĐỘNG</string>
     <string name="second">ĐÃ QUÉT TỰ ĐỘNG</string>
     <string name="share">Ứng dụng Quét mã thẻ nạp VIETTEL,MOBIFONE,VINAPHONE</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

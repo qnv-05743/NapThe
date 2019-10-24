@@ -10,8 +10,6 @@ import android.view.WindowManager;
 import com.scan.napthe.R;
 
 public class SplashActivity extends AppCompatActivity {
-    private static final int ZXING_CAMERA_PERMISSION = 1;
-    private Class<?> mClss;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

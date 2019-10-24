@@ -8,7 +8,9 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -43,7 +45,7 @@ public class CardActivity extends AppCompatActivity {
         String s = getIntent().getExtras().getString(Constants.TEXT_CODE);
         textView.setText(Constants.DIAL_SERFIX + s + Constants.DIAL_HASHTAG);
         final TextView first = (TextView) findViewById(R.id.txt_slide);
-       // final TextView second = (TextView) findViewById(R.id.txt_second);
+        // final TextView second = (TextView) findViewById(R.id.txt_second);
         final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 0.5f);
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setInterpolator(new LinearInterpolator());
@@ -55,29 +57,36 @@ public class CardActivity extends AppCompatActivity {
                 final float width = first.getWidth();
                 final float translationX = width * progress;
                 first.setTranslationX(translationX);
-              //  first.setTranslationX(translationX - width);
+                //  first.setTranslationX(translationX - width);
             }
         });
         animator.start();
     }
 
-
     public void Call(View view) {
-        Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", textView.getText().toString(), null));
-        int check = ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE);
-        if (check != PackageManager.PERMISSION_GRANTED) {
-            requestCallPermission();
-        } else {
-            startActivity(intent);
+        String s = textView.getText().toString();
+        if (s.equals("")) {
+            textView.setError("Không được để trống");
+        } else  {
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    //.setTitle("Closing Activity")
+                    .setMessage("Bạn có muốn thực hiện nạp thẻ?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", textView.getText().toString(), null));
+                            int check = ActivityCompat.checkSelfPermission(CardActivity.this, Manifest.permission.CALL_PHONE);
+                            if (check != PackageManager.PERMISSION_GRANTED) {
+                                requestCallPermission();
+                            } else {
+                                startActivity(intent);
+                            }
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
         }
-    }
-
-    public void onBackPressed() {
-        Intent myIntent = new Intent(CardActivity.this, MainActivity.class);
-        myIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);// clear back stack
-        startActivity(myIntent);
-        finish();
-        return;
     }
 
     private void requestCallPermission() {
@@ -90,9 +99,23 @@ public class CardActivity extends AppCompatActivity {
         }
     }
 
+    public void onBackPressed() {
+        Intent myIntent = new Intent(CardActivity.this, MainActivity.class);
+        myIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);// clear back stack
+        startActivity(myIntent);
+        finish();
+        return;
+    }
+
     public void refresh(View view) {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
+    }
+
+
+    public void Copy(View view) {
+        setClipboard();
+        Toast.makeText(this, "Đã copy mã thẻ!", Toast.LENGTH_SHORT).show();
     }
 
     private void setClipboard() {
@@ -100,11 +123,6 @@ public class CardActivity extends AppCompatActivity {
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         android.content.ClipData clip = android.content.ClipData.newPlainText("Copy Text", s);
         clipboard.setPrimaryClip(clip);
-    }
-
-    public void Copy(View view) {
-        setClipboard();
-        Toast.makeText(this, "Đã copy mã thẻ!", Toast.LENGTH_SHORT).show();
     }
 
     public void Guide(View view) {
@@ -116,7 +134,7 @@ public class CardActivity extends AppCompatActivity {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
         String shareBody = R.string.share + "" + "\n" +
-                "https://play.google.com/store";
+                "https://play.google.com";
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
         startActivity(Intent.createChooser(sharingIntent, "Quét mã thẻ điện thoại"));

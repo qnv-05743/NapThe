@@ -18,4 +18,5 @@
         android:icon="@android:drawable/ic_delete"
         android:title="Phiên bản 1.0.0" />
 
+
 </menu>

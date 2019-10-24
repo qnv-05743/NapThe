@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.scan.napthe">
-
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -28,7 +27,7 @@
             android:name=".ui.CardActivity"
             android:noHistory="true" />
         <activity android:name=".ui.MainActivity"
-            android:noHistory="true" />
+            android:noHistory="false" />
         <activity android:name=".ui.SplashActivity">
             <intent-filter>
                 <action
