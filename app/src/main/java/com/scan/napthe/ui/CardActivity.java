@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
@@ -66,8 +67,8 @@ public class CardActivity extends AppCompatActivity {
     public void Call(View view) {
         String s = textView.getText().toString();
         if (s.equals("")) {
-            textView.setError("Không được để trống");
-        } else  {
+            textView.setError("Không được để trống!");
+        } else if (s.startsWith("*100*") && s.endsWith("#") && s.length() > 18) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     //.setTitle("Closing Activity")
@@ -86,6 +87,9 @@ public class CardActivity extends AppCompatActivity {
                     })
                     .setNegativeButton("No", null)
                     .show();
+
+        }else {
+            textView.setError("Sai cú pháp!");
         }
     }
 
@@ -109,7 +113,10 @@ public class CardActivity extends AppCompatActivity {
 
     public void refresh(View view) {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+        finish();
+        return;
     }
 
 
