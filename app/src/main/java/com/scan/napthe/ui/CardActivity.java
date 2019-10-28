@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -28,12 +29,14 @@ import com.scan.napthe.R;
 import com.scan.napthe.ultils.Constants;
 
 import static com.scan.napthe.ultils.Constants.DIAL_HASHTAG;
+import static com.scan.napthe.ultils.Constants.DIAL_SERFIX;
 
 public class CardActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private EditText textView;
     private Button button;
     private static final int RC_HANDLE_CALL_PERM = 3;
+    private int REQUEST_PERMISSION_SETTING = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +47,7 @@ public class CardActivity extends AppCompatActivity {
         textView = findViewById(R.id.code);
         button = (Button) findViewById(R.id.btn_submit);
         String s = getIntent().getExtras().getString(Constants.TEXT_CODE);
-        textView.setText(Constants.DIAL_SERFIX + s + Constants.DIAL_HASHTAG);
+        textView.setText(DIAL_SERFIX + s + Constants.DIAL_HASHTAG);
         final TextView first = (TextView) findViewById(R.id.txt_slide);
         // final TextView second = (TextView) findViewById(R.id.txt_second);
         final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 0.5f);
@@ -68,29 +71,49 @@ public class CardActivity extends AppCompatActivity {
         String s = textView.getText().toString();
         if (s.equals("")) {
             textView.setError("Không được để trống!");
-        } else if (s.startsWith("*100*") && s.endsWith("#") && s.length() > 18) {
+        } else if (s.startsWith(DIAL_SERFIX) && s.endsWith(DIAL_HASHTAG) && s.length() > 18) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     //.setTitle("Closing Activity")
-                    .setMessage("Bạn có muốn thực hiện nạp thẻ?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    .setMessage(R.string.message)
+                    .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", textView.getText().toString(), null));
                             int check = ActivityCompat.checkSelfPermission(CardActivity.this, Manifest.permission.CALL_PHONE);
                             if (check != PackageManager.PERMISSION_GRANTED) {
                                 requestCallPermission();
-                            } else {
+                            } else if (check == PackageManager.PERMISSION_GRANTED) {
                                 startActivity(intent);
                             }
+
                         }
+
                     })
-                    .setNegativeButton("No", null)
+                    .setNegativeButton(R.string.no, null)
                     .show();
 
-        }else {
+        } else {
             textView.setError("Sai cú pháp!");
         }
+    }
+
+    private void showMessageOKCancel(int message, DialogInterface.OnClickListener okListener) {
+        new androidx.appcompat.app.AlertDialog.Builder(CardActivity.this)
+                .setTitle(R.string.noti)
+                .setMessage(message)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .create()
+                .show();
     }
 
     private void requestCallPermission() {
@@ -100,6 +123,16 @@ public class CardActivity extends AppCompatActivity {
                 Manifest.permission.CALL_PHONE)) {
             ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CALL_PERM);
             return;
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CALL_PHONE)) {
+
+            showMessageOKCancel(R.string.notifica,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            onPause();
+                        }
+                    });
         }
     }
 
@@ -122,7 +155,7 @@ public class CardActivity extends AppCompatActivity {
 
     public void Copy(View view) {
         setClipboard();
-        Toast.makeText(this, "Đã copy mã thẻ!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.copy, Toast.LENGTH_SHORT).show();
     }
 
     private void setClipboard() {

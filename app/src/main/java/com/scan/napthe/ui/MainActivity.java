@@ -68,16 +68,17 @@ import com.scan.napthe.ultils.Constants;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.security.Permission;
 import java.security.Policy;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int PERMISSION_REQUEST_CODE = 200;
+    private static final int PERMISSION_REQUEST_CODE = 3;
     // private static final String SHARED_PREFERENCES_NAME = "PREFERENCES";
     private Toolbar toolbar;
     private CameraSource mCameraSource;
-    final int requestPermissionID = 1001;
+    final int requestPermissionID = 1;
     private SurfaceView mCameraView;
     private SeekBar seekBar;
     private AlertDialog alertDialog;
@@ -97,11 +98,8 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case requestPermissionID: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
                         return;
-
-                    }
-
                     try {
                         mCameraSource.start(mCameraView.getHolder());
                     } catch (IOException e) {
@@ -113,18 +111,19 @@ public class MainActivity extends AppCompatActivity {
                     mCameraView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            showMessageOKCancel(R.string.notification,
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                requestPermission();
-                                            } else {
-                                                finish();
+                            int check = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
+                            if (check != PackageManager.PERMISSION_GRANTED) {
+                                showMessageOKCancel(R.string.notification,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                onPause();
                                             }
-                                        }
+                                        });
+                            } else if (check == PackageManager.PERMISSION_GRANTED){
 
-                                    });
+                            }
+
                         }
                     });
                 }
@@ -139,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     private void showMessageOKCancel(int message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(MainActivity.this)
                 .setMessage(message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -148,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.cancel, null)
                 .create()
                 .show();
     }
@@ -176,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.d("TAG", "onProgressChanged: " + progress);
+              //  Log.d("TAG", "onProgressChanged: " + progress);
 
                 if (camera != null && camera.getParameters().isZoomSupported()) {
 
@@ -184,12 +183,9 @@ public class MainActivity extends AppCompatActivity {
                     params.setZoom(progress);
                     seekBar.setMax(params.getMaxZoom());
                     camera.setParameters(params);
-
-
                 }
-                // initCamera();
+                initCamera();
             }
-
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -201,14 +197,6 @@ public class MainActivity extends AppCompatActivity {
                 //    seekBar.setSecondaryProgress(seekBar.getProgress());
             }
         });
-//        mCameraView.post(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        });
-
-       // mCameraView.getHolder().setFixedSize(720,720);
 
         startCameraSource();
 
@@ -221,10 +209,12 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
 
+
         }
 
+
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Nhấn back 1 lần nữa để thoát!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.back, Toast.LENGTH_SHORT).show();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -247,20 +237,16 @@ public class MainActivity extends AppCompatActivity {
         //Create the TextRecognizerd
         final TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
         if (!textRecognizer.isOperational()) {
-            Log.w("a", "Detector dependencies not loaded yet");
+          //  Log.w("a", "Detector dependencies not loaded yet");
         } else {
-
-            mCameraView.getHolder().setFixedSize(1024, 720);
 
             //Initialize camerasource to use high resolution and set Autofocus on.
             mCameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
-                 ///   .setRequestedPreviewSize(1080, 2040)
+                    .setRequestedPreviewSize(1024, 1080)
                     .setRequestedFps(40.0f)
                     .setAutoFocusEnabled(true)
                     .build();
-
-
 
 
             /**
@@ -360,8 +346,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void notification() {
-        SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
-        boolean isNoti = pre.getBoolean("beep", true);
+        SharedPreferences pre = getSharedPreferences(Constants.KEY, MODE_PRIVATE);
+        boolean isNoti = pre.getBoolean(Constants.KEY_BEEP, true);
         if (isNoti) {
             toneGen = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 90);
             toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 100);
@@ -370,14 +356,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void vibrator() {
-        SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
-        boolean isVira = pre.getBoolean("rung", true);
+        SharedPreferences pre = getSharedPreferences(Constants.KEY, MODE_PRIVATE);
+        boolean isVira = pre.getBoolean(Constants.KEY_VIBRA, true);
         if (isVira) {
             v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 v.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) {
-                v.cancel();
+            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+
             }
         }
 
@@ -415,6 +401,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        seekBar.setProgress(0);
     }
 
     @Override
@@ -456,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
                 break;
             case R.id.menu4:
-                Toast.makeText(this, "PHIÊN BẢN 1.0.0", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.info, Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -468,7 +455,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void displayAlertDialog() {
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("TÙY CHỌN RUNG VÀ TIẾNG BEEP");
+        alert.setTitle(R.string.setting);
         LayoutInflater inflater = getLayoutInflater();
         final View alertLayout = inflater.inflate(R.layout.option_dialog, null);
         final CheckBox cb_beep = (CheckBox) alertLayout.findViewById(R.id.cb_beep);
@@ -478,9 +465,9 @@ public class MainActivity extends AppCompatActivity {
         alert.setCancelable(false);
         final AlertDialog dialog = alert.create();
         dialog.show();
-        SharedPreferences pre = getSharedPreferences("edit", MODE_PRIVATE);
-        boolean isVira = pre.getBoolean("rung", true);
-        boolean isNoti = pre.getBoolean("beep", true);
+        SharedPreferences pre = getSharedPreferences(Constants.KEY, MODE_PRIVATE);
+        boolean isVira = pre.getBoolean(Constants.KEY_VIBRA, true);
+        boolean isNoti = pre.getBoolean(Constants.KEY_BEEP, true);
 
         cb_beep.setChecked(isNoti);
         cb_rung.setChecked(isVira);
@@ -496,13 +483,13 @@ public class MainActivity extends AppCompatActivity {
         cb_beep.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences sharedPreferences = getSharedPreferences("edit", Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = getSharedPreferences(Constants.KEY, Context.MODE_PRIVATE);
                 Editor editor = sharedPreferences.edit();
-                editor.putBoolean("beep", cb_beep.isChecked());
+                editor.putBoolean(Constants.KEY_BEEP, cb_beep.isChecked());
                 if (cb_beep.isChecked()) {
-                    editor.putInt("beep_value", 0);
+                    editor.putInt(Constants.KEY_BEEP_VALUE, 0);
                 } else {
-                    editor.putInt("beep_value", 1);
+                    editor.putInt(Constants.KEY_BEEP_VALUE, 1);
                 }
                 editor.commit();
 
@@ -513,13 +500,13 @@ public class MainActivity extends AppCompatActivity {
         cb_rung.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences sharedPreferences = getSharedPreferences("edit", Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = getSharedPreferences(Constants.KEY, Context.MODE_PRIVATE);
                 Editor editor = sharedPreferences.edit();
-                editor.putBoolean("rung", cb_rung.isChecked());
+                editor.putBoolean(Constants.KEY_VIBRA, cb_rung.isChecked());
                 if (cb_rung.isChecked()) {
-                    editor.putInt("rung_value", 0);
+                    editor.putInt(Constants.KEY_VIBRA_VALUE, 0);
                 } else {
-                    editor.putInt("rung_value", 1);
+                    editor.putInt(Constants.KEY_VIBRA_VALUE, 1);
                 }
                 editor.commit();
             }
@@ -550,19 +537,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void toggleFlash(View v) {
-        Context context = v.getContext();
-        if (camera != null && context.getPackageManager().hasSystemFeature(getPackageManager().FEATURE_CAMERA_FLASH)) {
-            Camera.Parameters params = camera.getParameters();
-            if (isFlash) {
-                params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                camera.setParameters(params);
-                isFlash = false;
-            } else {
-                params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                camera.setParameters(params);
-                isFlash = true;
+        int check = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
+        if (check != PackageManager.PERMISSION_GRANTED) {
+            showMessageOKCancel(R.string.notification,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            onPause();
+                        }
+                    });
+        } else if (check == PackageManager.PERMISSION_GRANTED){
+            Context context = v.getContext();
+            if (camera != null && context.getPackageManager().hasSystemFeature(getPackageManager().FEATURE_CAMERA_FLASH)) {
+                Camera.Parameters params = camera.getParameters();
+                if (isFlash) {
+                    params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                    camera.setParameters(params);
+                    isFlash = false;
+                } else {
+                    params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                    camera.setParameters(params);
+                    isFlash = true;
+                }
             }
         }
+
         initCamera();
 
     }
@@ -570,7 +569,7 @@ public class MainActivity extends AppCompatActivity {
     public void share(View view) {
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        String shareBody = R.string.share + "" + "\n" + Uri.parse("https://play.google.com/store");
+        String shareBody = R.string.share + " " + "\n" + Uri.parse("https://play.google.com/store");
         sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
         sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
         startActivity(Intent.createChooser(sharingIntent, "Quét mã thẻ điện thoại"));

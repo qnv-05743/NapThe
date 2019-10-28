@@ -9,10 +9,10 @@
     <string name="title_name_guide">TRỢ GIÚP QUÉT MÃ THẺ CÀO ĐIỆN THOẠI TỰ ĐỘNG</string>
     <string name="dialog">Tiếng Beep và rung là khi quét được mã thẻ sẽ rung hoặc kêu beep (Có thể tùy chọn tắt bật cả hai hoặc một trong hai).</string>
     <string name="help_guide">
-                           "\n" - Đưa phần camera vào vùng mã thẻ đã được cạo sạch. "\n"
-                            - Nhận mã thẻ chọn "Nạp thẻ" hoặc sao chép.
+                           "\n" \u2022 Đưa phần camera vào vùng mã thẻ đã được cạo sạch. "\n"
+                            \u2022 Nhận mã thẻ chọn Nạp thẻ hoặc sao chép.
         </string>
-    <string name="guid">"\n"PHẦN MỀM NẠP THẺ ĐIỆN THOẠI :</string>
+    <string name="guid">"\n "PHẦN MỀM NẠP THẺ ĐIỆN THOẠI :</string>
     <string name="title_result">KẾT QUẢ MÃ THẺ CÀO ĐÃ ĐƯỢC QUÉT TỰ ĐỘNG</string>
     <string name="second">ĐÃ QUÉT TỰ ĐỘNG</string>
     <string name="share">Ứng dụng Quét mã thẻ nạp VIETTEL,MOBIFONE,VINAPHONE</string>
@@ -20,4 +20,18 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="notification">Ứng dụng này không thể quét tự động vì bạn không cho phép quyền truy cập máy ảnh (Camera).Vui lòng cho phép truy cập máy ảnh bên trong ứng dụng.</string>
+    <string name="dacap">Đã cấp quyền truy cập</string>
+    <string name="notifica">Bạn cần cấp quyền truy cập điện thoại để thực hiện việc nạp thẻ.</string>
+    <string name="back">Nhấn back 1 lần nữa để thoát!</string>
+    <string name="setting">TÙY CHỌN RUNG VÀ TIẾNG BEEP</string>
+    <string name="url"></string>
+    <string name="info">PHIÊN BẢN 1.0.0</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="noti">Thông báo!</string>
+    <string name="copy">Đã copy mã thẻ!</string>
+    <string name="error">Sai cú pháp!</string>
+    <string name="no">No</string>
+    <string name="Yes">Yes</string>
+    <string name="message">Bạn có muốn thực hiện nạp thẻ?</string>
 </resources>
