@@ -34,4 +34,5 @@
     <string name="no">No</string>
     <string name="Yes">Yes</string>
     <string name="message">Bạn có muốn thực hiện nạp thẻ?</string>
+    <string name="notification_flash">Không thể bật đèn FLASH vì bạn chưa cấp quyền truy cập máy ảnh (CAMERA).Vui lòng cho phép truy cập máy ảnh bên trong ứng dụng.</string>
 </resources>

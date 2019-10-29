@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     // private static final String SHARED_PREFERENCES_NAME = "PREFERENCES";
     private Toolbar toolbar;
     private CameraSource mCameraSource;
-    final int requestPermissionID = 1;
+    final int requestPermissionID = 100;
     private SurfaceView mCameraView;
     private SeekBar seekBar;
     private AlertDialog alertDialog;
@@ -91,15 +91,15 @@ public class MainActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     private int REQUEST_PERMISSION_SETTING = 0;
     private static final int RC_HANDLE_CALL_PERM = 3;
-    private int REQUEST_CAMERA = 0;
+    private int REQUEST_CAMERA = 3;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case requestPermissionID: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-                        return;
+                if (grantResults.length> 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                   if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+//                        return;
                     try {
                         mCameraSource.start(mCameraView.getHolder());
                     } catch (IOException e) {
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                                                 onPause();
                                             }
                                         });
-                            } else if (check == PackageManager.PERMISSION_GRANTED){
+                            } else if (check == PackageManager.PERMISSION_GRANTED) {
 
                             }
 
@@ -132,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
 
 
             break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
@@ -539,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
     public void toggleFlash(View v) {
         int check = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
         if (check != PackageManager.PERMISSION_GRANTED) {
-            showMessageOKCancel(R.string.notification,
+            showMessageOKCancel(R.string.notification_flash,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
