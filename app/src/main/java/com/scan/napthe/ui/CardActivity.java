@@ -30,6 +30,7 @@ import com.scan.napthe.ultils.Constants;
 
 import static com.scan.napthe.ultils.Constants.DIAL_HASHTAG;
 import static com.scan.napthe.ultils.Constants.DIAL_SERFIX;
+import static com.scan.napthe.ultils.Constants.TEXT_CODE;
 
 public class CardActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -159,9 +160,10 @@ public class CardActivity extends AppCompatActivity {
     }
 
     private void setClipboard() {
-        String s = getIntent().getStringExtra(Constants.TEXT_CODE);
+        String s = textView.getText().toString();
+
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        android.content.ClipData clip = android.content.ClipData.newPlainText("Copy Text", s);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("Copy Text",s);
         clipboard.setPrimaryClip(clip);
     }
 
@@ -169,7 +171,6 @@ public class CardActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
         startActivity(intent);
     }
-
     public void Share(View view) {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
@@ -178,6 +179,5 @@ public class CardActivity extends AppCompatActivity {
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
         startActivity(Intent.createChooser(sharingIntent, "Quét mã thẻ điện thoại"));
-
     }
 }

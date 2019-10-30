@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GestureDetectorCompat;
 
 import android.Manifest;
 import android.content.Context;
@@ -38,6 +39,7 @@ import android.util.EventLog;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,7 +76,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int PERMISSION_REQUEST_CODE = 3;
+    private static final int PERMISSION_REQUEST_CODE = 0;
     // private static final String SHARED_PREFERENCES_NAME = "PREFERENCES";
     private Toolbar toolbar;
     private CameraSource mCameraSource;
@@ -92,14 +94,16 @@ public class MainActivity extends AppCompatActivity {
     private int REQUEST_PERMISSION_SETTING = 0;
     private static final int RC_HANDLE_CALL_PERM = 3;
     private int REQUEST_CAMERA = 3;
+    private boolean isScanning = true;
+    private boolean isZoom = true;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case requestPermissionID: {
-                if (grantResults.length> 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                   if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-//                        return;
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                        return;
                     try {
                         mCameraSource.start(mCameraView.getHolder());
                     } catch (IOException e) {
@@ -172,15 +176,51 @@ public class MainActivity extends AppCompatActivity {
         seekBar = (SeekBar) findViewById(R.id.seekbar_controls);
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
         image_flash = (ImageView) findViewById(R.id.image_flash);
+        startCameraSource();
 
+        image_flash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                image_flash.setSelected(!image_flash.isSelected());
+                int check = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
+                if (check != PackageManager.PERMISSION_GRANTED) {
+                    showMessageOKCancel(R.string.notification_flash,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // onPause();
+                                }
+                            });
+                } else if (check == PackageManager.PERMISSION_GRANTED) {
+                    Context context = v.getContext();
+                    if (camera != null && context.getPackageManager().hasSystemFeature(getPackageManager().FEATURE_CAMERA_FLASH)) {
+                        Camera.Parameters params = camera.getParameters();
+                        if (isFlash) {
+                            image_flash.setImageResource(R.drawable.flashofff);
+                            params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                            camera.setParameters(params);
+                            isFlash = false;
+                        } else {
+                            image_flash.setImageResource(R.drawable.flashon);
+                            params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                            camera.setParameters(params);
+                            isFlash = true;
+                        }
+                    }
+                    initCamera();
+                    //&& context.getPackageManager().hasSystemFeature(getPackageManager().FEATURE_CAMERA_FLASH  }
+                }
+
+            }
+
+        });
         // Event on change zoom with the bar.
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-              //  Log.d("TAG", "onProgressChanged: " + progress);
+                Log.d("PRO", "onProgressChanged: " + progress);
 
                 if (camera != null && camera.getParameters().isZoomSupported()) {
-
                     Camera.Parameters params = camera.getParameters();
                     params.setZoom(progress);
                     seekBar.setMax(params.getMaxZoom());
@@ -189,6 +229,8 @@ public class MainActivity extends AppCompatActivity {
                 initCamera();
             }
 
+
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
 
@@ -196,11 +238,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                //    seekBar.setSecondaryProgress(seekBar.getProgress());
+
             }
         });
 
-        startCameraSource();
 
     }
 
@@ -221,25 +262,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 doubleBackToExitPressedOnce = false;
-
             }
 
         }, 2000);
 
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        camera.release();
-
-    }
 
     private void startCameraSource() {
         //Create the TextRecognizerd
         final TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
         if (!textRecognizer.isOperational()) {
-          //  Log.w("a", "Detector dependencies not loaded yet");
+            //  Log.w("a", "Detector dependencies not loaded yet");
         } else {
 
             //Initialize camerasource to use high resolution and set Autofocus on.
@@ -258,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
             mCameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
                 @Override
                 public void surfaceCreated(SurfaceHolder holder) {
+
                     try {
 
                         if (ActivityCompat.checkSelfPermission(getApplicationContext(),
@@ -287,6 +322,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
                 }
 
                 /**
@@ -294,8 +330,7 @@ public class MainActivity extends AppCompatActivity {
                  */
                 @Override
                 public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
-                    //camera.release();
+                    seekBar.setProgress(0);
                     mCameraSource.stop();
                 }
             });
@@ -305,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
             textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
                 @Override
                 public void release() {
-                    // camera.release();
+                    mCameraSource.stop();
                 }
 
 
@@ -327,23 +362,30 @@ public class MainActivity extends AppCompatActivity {
                                 if (s.isEmpty()) {
                                     s.split(NUMBER);
                                 } else if (s.equals(detectCode(s)) && s.length() < 14) {
-                                    notification();
-                                    vibrator();
-                                    Intent intent = new Intent(MainActivity.this, CardActivity.class);
-                                    intent.putExtra(Constants.TEXT_CODE, s);
-                                    startActivity(intent);
-                                    Log.d("TAG", "run: " + s);
-                                    mCameraSource.stop();
+                                    if (isScanning) {
+                                        isScanning = false;
+                                        gotoCardDetail(s);
+                                        Log.d("TAG", "run: " + s);
+
+                                    }
+
+//                                       mCameraSource.stop();
                                 }
-
                             }
-
                         });
                     }
 
                 }
             });
         }
+    }
+
+    private void gotoCardDetail(String cardNumber) {
+        notification();
+        vibrator();
+        Intent intent = new Intent(MainActivity.this, CardActivity.class);
+        intent.putExtra(Constants.TEXT_CODE, cardNumber);
+        startActivity(intent);
     }
 
 
@@ -403,15 +445,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        seekBar.setProgress(0);
+        isScanning = true;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
+
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -525,9 +579,8 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     camera = (Camera) field.get(mCameraSource);
                     if (camera != null) {
-                        // Camera.Parameters params = camera.getParameters();
                         Camera.Parameters params = camera.getParameters();
-                        // camera.setParameters(params);
+                        //  camera.setParameters(params);
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -539,32 +592,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void toggleFlash(View v) {
-        int check = ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA);
-        if (check != PackageManager.PERMISSION_GRANTED) {
-            showMessageOKCancel(R.string.notification_flash,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            onPause();
-                        }
-                    });
-        } else if (check == PackageManager.PERMISSION_GRANTED){
-            Context context = v.getContext();
-            if (camera != null && context.getPackageManager().hasSystemFeature(getPackageManager().FEATURE_CAMERA_FLASH)) {
-                Camera.Parameters params = camera.getParameters();
-                if (isFlash) {
-                    params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                    camera.setParameters(params);
-                    isFlash = false;
-                } else {
-                    params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-                    camera.setParameters(params);
-                    isFlash = true;
-                }
-            }
-        }
 
-        initCamera();
 
     }
 
@@ -579,7 +607,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Guide(View view) {
-        Intent intent = new Intent(MainActivity.this, GuideActivity.class);
+        Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
         startActivity(intent);
     }
 

@@ -73,6 +73,7 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:maxLength="23"
+                android:textIsSelectable="true"
                 android:maxWidth="5dp"
                 android:padding="2.5dp"
                 android:textColor="#000000"

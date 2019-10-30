@@ -33,7 +33,8 @@
             android:noHistory="false" />
         <activity
             android:name=".ui.MainActivity"
-            android:noHistory="false" />
+            android:noHistory="false"
+             />
         <activity android:name=".ui.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
