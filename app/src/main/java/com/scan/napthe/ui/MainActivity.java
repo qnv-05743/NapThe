@@ -65,6 +65,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.scan.napthe.BuildConfig;
 import com.scan.napthe.R;
 import com.scan.napthe.ultils.Constants;
 
@@ -598,13 +599,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void share(View view) {
-        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-        sharingIntent.setType("text/plain");
-        String shareBody = R.string.share + " " + "\n" + Uri.parse("https://play.google.com/store");
-        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject Here");
-        sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-        startActivity(Intent.createChooser(sharingIntent, "Quét mã thẻ điện thoại"));
-
+        try {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Ứng dụng quét mã thẻ cào tự động");
+            String shareMessage= "\nHãy để tôi giới thiệu cho bạn ứng dụng này\n\n\n";
+            shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID +"\n\n";
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+            startActivity(Intent.createChooser(shareIntent, "Share"));
+        } catch(Exception e) {
+            //e.toString();
+        }
     }
 
     public void Guide(View view) {
