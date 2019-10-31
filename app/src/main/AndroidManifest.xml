@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.scan.napthe">
 
-    <uses-permission
-        android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-feature android:name="android.hardware.camera.flash" />
@@ -17,7 +16,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
 
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/logo"
@@ -25,17 +23,21 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.GuideActivity"
+        <activity
+            android:name=".ui.GuideActivity"
             android:noHistory="true"
-            ></activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.CardActivity"
-            android:noHistory="false" />
+            android:noHistory="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.MainActivity"
             android:noHistory="false"
-             />
-        <activity android:name=".ui.SplashActivity">
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.SplashActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

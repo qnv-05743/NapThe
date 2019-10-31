@@ -1,40 +1,40 @@
 package com.scan.napthe.ui;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.flags.impl.DataUtils;
+import com.google.zxing.common.StringUtils;
 import com.scan.napthe.R;
 import com.scan.napthe.ultils.Constants;
 
+import static com.scan.napthe.ultils.Constants.*;
 import static com.scan.napthe.ultils.Constants.DIAL_HASHTAG;
 import static com.scan.napthe.ultils.Constants.DIAL_SERFIX;
-import static com.scan.napthe.ultils.Constants.TEXT_CODE;
 
 public class CardActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private EditText textView;
+    private TextView  editText1, editText2;
     private Button button;
     private static final int RC_HANDLE_CALL_PERM = 3;
     private int REQUEST_PERMISSION_SETTING = 0;
@@ -46,9 +46,13 @@ public class CardActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         textView = findViewById(R.id.code);
+        editText1 = findViewById(R.id.firs);
+        editText2 = findViewById(R.id.second);
         button = (Button) findViewById(R.id.btn_submit);
-        String s = getIntent().getExtras().getString(Constants.TEXT_CODE);
-        textView.setText(DIAL_SERFIX + s + Constants.DIAL_HASHTAG);
+        String s = getIntent().getExtras().getString(TEXT_CODE);
+       textView.setText(s);
+        editText1.setText(DIAL_SERFIX);
+        editText2.setText(DIAL_HASHTAG);
         final TextView first = (TextView) findViewById(R.id.txt_slide);
         // final TextView second = (TextView) findViewById(R.id.txt_second);
         final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 0.5f);
@@ -70,9 +74,11 @@ public class CardActivity extends AppCompatActivity {
 
     public void Call(View view) {
         String s = textView.getText().toString();
+        editText1.setText(DIAL_SERFIX);
+        editText2.setText(DIAL_HASHTAG);
         if (s.equals("")) {
             textView.setError("Không được để trống!");
-        } else if (s.startsWith(DIAL_SERFIX) && s.endsWith(DIAL_HASHTAG) && s.length() > 18) {
+        } else if ( s.length() > 12) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     //.setTitle("Closing Activity")
@@ -80,7 +86,7 @@ public class CardActivity extends AppCompatActivity {
                     .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", textView.getText().toString(), null));
+                            Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", editText1.getText().toString() + textView.getText().toString() + editText2.getText().toString(), null));
                             int check = ActivityCompat.checkSelfPermission(CardActivity.this, Manifest.permission.CALL_PHONE);
                             if (check != PackageManager.PERMISSION_GRANTED) {
                                 requestCallPermission();
@@ -95,7 +101,8 @@ public class CardActivity extends AppCompatActivity {
                     .show();
 
         } else {
-            textView.setError("Sai cú pháp!");
+            textView.setError("Mã thẻ phải lớn hơn 12 số!");
+
         }
     }
 
@@ -161,9 +168,8 @@ public class CardActivity extends AppCompatActivity {
 
     private void setClipboard() {
         String s = textView.getText().toString();
-
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        android.content.ClipData clip = android.content.ClipData.newPlainText("Copy Text",s);
+        android.content.ClipData clip = android.content.ClipData.newPlainText("Copy Text", s);
         clipboard.setPrimaryClip(clip);
     }
 
@@ -171,6 +177,7 @@ public class CardActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), GuideActivity.class);
         startActivity(intent);
     }
+
     public void Share(View view) {
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");

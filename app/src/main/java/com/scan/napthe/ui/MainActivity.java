@@ -230,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
 
@@ -500,6 +499,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu4:
                 Toast.makeText(this, R.string.info, Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(MainActivity.this, CardActivity.class);
+//                startActivity(intent);
                 break;
             default:
                 break;
