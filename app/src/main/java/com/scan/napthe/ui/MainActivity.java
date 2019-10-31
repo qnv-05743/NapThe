@@ -78,7 +78,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 0;
-    // private static final String SHARED_PREFERENCES_NAME = "PREFERENCES";
     private Toolbar toolbar;
     private CameraSource mCameraSource;
     final int requestPermissionID = 100;
@@ -93,10 +92,9 @@ public class MainActivity extends AppCompatActivity {
     private ToneGenerator toneGen;
     boolean doubleBackToExitPressedOnce = false;
     private int REQUEST_PERMISSION_SETTING = 0;
-    private static final int RC_HANDLE_CALL_PERM = 3;
     private int REQUEST_CAMERA = 3;
     private boolean isScanning = true;
-    private boolean isZoom = true;
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -159,12 +157,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.CAMERA},
-                PERMISSION_REQUEST_CODE);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -209,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     initCamera();
-                    //&& context.getPackageManager().hasSystemFeature(getPackageManager().FEATURE_CAMERA_FLASH  }
                 }
 
             }
@@ -283,7 +274,6 @@ public class MainActivity extends AppCompatActivity {
                     .setRequestedFps(40.0f)
                     .setAutoFocusEnabled(true)
                     .build();
-
 
             /**
              * Add call back to SurfaceView and check if camera permission is granted.
@@ -369,7 +359,6 @@ public class MainActivity extends AppCompatActivity {
 
                                     }
 
-//                                       mCameraSource.stop();
                                 }
                             }
                         });
@@ -500,8 +489,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu4:
                 Toast.makeText(this, R.string.info, Toast.LENGTH_SHORT).show();
-//                Intent intent = new Intent(MainActivity.this, CardActivity.class);
-//                startActivity(intent);
                 break;
             default:
                 break;

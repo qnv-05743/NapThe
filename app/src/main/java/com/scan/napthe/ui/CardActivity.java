@@ -34,7 +34,7 @@ import static com.scan.napthe.ultils.Constants.DIAL_SERFIX;
 public class CardActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private EditText textView;
-    private TextView  editText1, editText2;
+    private TextView editText1, editText2;
     private Button button;
     private static final int RC_HANDLE_CALL_PERM = 3;
     private int REQUEST_PERMISSION_SETTING = 0;
@@ -50,11 +50,10 @@ public class CardActivity extends AppCompatActivity {
         editText2 = findViewById(R.id.second);
         button = (Button) findViewById(R.id.btn_submit);
         String s = getIntent().getExtras().getString(TEXT_CODE);
-       textView.setText(s);
+        textView.setText(s);
         editText1.setText(DIAL_SERFIX);
         editText2.setText(DIAL_HASHTAG);
         final TextView first = (TextView) findViewById(R.id.txt_slide);
-        // final TextView second = (TextView) findViewById(R.id.txt_second);
         final ValueAnimator animator = ValueAnimator.ofFloat(0.0f, 0.5f);
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setInterpolator(new LinearInterpolator());
@@ -66,7 +65,6 @@ public class CardActivity extends AppCompatActivity {
                 final float width = first.getWidth();
                 final float translationX = width * progress;
                 first.setTranslationX(translationX);
-                //  first.setTranslationX(translationX - width);
             }
         });
         animator.start();
@@ -78,10 +76,9 @@ public class CardActivity extends AppCompatActivity {
         editText2.setText(DIAL_HASHTAG);
         if (s.equals("")) {
             textView.setError("Không được để trống!");
-        } else if ( s.length() > 12) {
+        } else if (s.length() > 12) {
             new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    //.setTitle("Closing Activity")
                     .setMessage(R.string.message)
                     .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
                         @Override
